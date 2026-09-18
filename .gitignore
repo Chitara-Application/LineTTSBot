@@ -7,3 +7,6 @@ logs/
 *.log
 tmp/
 temp/
+
+# FFmpeg binaries
+tools/ffmpeg/
