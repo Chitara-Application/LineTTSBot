@@ -1,6 +1,5 @@
 {
   "version": 1,
-
   "line": {
     "device": "DESKTOPWIN",
     "sessionFile": "data/session/line.json",
@@ -8,7 +7,6 @@
       "mode": "password"
     }
   },
-
   "voicevox": {
     "enabled": true,
     "host": "127.0.0.1",
@@ -21,14 +19,11 @@
     "requestTimeoutMs": 10000,
     "stopOnExit": true
   },
-
   "groups": {},
-
   "speakers": {
     "default": 1,
     "users": {}
   },
-
   "replaceRules": [
     {
       "enabled": true,
@@ -43,7 +38,6 @@
       "flags": "giu"
     }
   ],
-
   "filters": {
     "ignoreEmpty": true,
     "ignoreOwnMessages": true,
@@ -53,50 +47,42 @@
     "blockedWords": [],
     "blockedUsers": []
   },
-
   "queue": {
     "maxSize": 20,
     "overflowPolicy": "drop-oldest",
     "interruptCurrent": false
   },
-
   "reconnect": {
     "enabled": true,
     "maxAttempts": 10,
     "delayMs": 5000,
     "maxDelayMs": 60000
   },
-
   "call": {
     "autoJoin": true,
     "autoLeave": true,
     "joinDelayMs": 1000,
     "reconnectDelayMs": 3000
   },
-
   "audio": {
     "sampleRate": 48000,
     "channels": 1,
     "frameDurationMs": 20
   },
-
   "notifications": {
     "entry": true,
     "exit": true
   },
-
   "rateLimit": {
     "enabled": true,
     "maxMessages": 20,
     "windowMs": 10000
   },
-
   "logging": {
     "level": "info",
     "file": "logs/app.log",
     "console": true
   },
-
   "gui": {
     "enabled": true,
     "closeToTray": true,

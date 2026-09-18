@@ -8,7 +8,12 @@ const GroupConfigSchema = z.object({
   announceJoin: z.boolean().default(true),
   announceLeave: z.boolean().default(true),
 
-  defaultSpeaker: z.number().int().nonnegative().nullable().default(null),
+  defaultSpeaker: z
+    .number()
+    .int()
+    .nonnegative()
+    .nullable()
+    .default(null),
 
   maxMessageLength: z
     .number()
@@ -24,59 +29,282 @@ const ReplaceRuleSchema = z.object({
   flags: z.string().default("gu")
 });
 
+const LineAuthSchema = z.object({
+  mode: z.enum(["password", "token"]).default("password")
+});
+
+const LineConfigSchema = z.object({
+  device: z.string().default("DESKTOPWIN"),
+  sessionFile: z.string().default("data/session/line.json"),
+  auth: LineAuthSchema.default(LineAuthSchema.parse({}))
+});
+
+const VoicevoxConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+
+  host: z
+    .string()
+    .default("127.0.0.1"),
+
+  port: z
+    .number()
+    .int()
+    .positive()
+    .default(50021),
+
+  autoStart: z
+    .boolean()
+    .default(true),
+
+  required: z
+    .boolean()
+    .default(false),
+
+  executable: z
+    .string()
+    .default("VOICEVOX/run.exe"),
+
+  args: z
+    .array(z.string())
+    .default([]),
+
+  startupTimeoutMs: z
+    .number()
+    .int()
+    .positive()
+    .default(90000),
+
+  requestTimeoutMs: z
+    .number()
+    .int()
+    .positive()
+    .default(10000),
+
+  stopOnExit: z
+    .boolean()
+    .default(true)
+});
+
+const SpeakersConfigSchema = z.object({
+  default: z
+    .number()
+    .int()
+    .nonnegative()
+    .default(1),
+
+  users: z
+    .record(
+      z.string(),
+      z.number().int().nonnegative()
+    )
+    .default({})
+});
+
+const FiltersConfigSchema = z.object({
+  ignoreEmpty: z
+    .boolean()
+    .default(true),
+
+  ignoreOwnMessages: z
+    .boolean()
+    .default(true),
+
+  ignoreBotMessages: z
+    .boolean()
+    .default(true),
+
+  ignoreCommands: z
+    .boolean()
+    .default(true),
+
+  maxMessageLength: z
+    .number()
+    .int()
+    .positive()
+    .default(500),
+
+  blockedWords: z
+    .array(z.string())
+    .default([]),
+
+  blockedUsers: z
+    .array(z.string())
+    .default([])
+});
+
+const QueueConfigSchema = z.object({
+  maxSize: z
+    .number()
+    .int()
+    .positive()
+    .default(20),
+
+  overflowPolicy: z
+    .enum([
+      "drop-oldest",
+      "drop-newest"
+    ])
+    .default("drop-oldest"),
+
+  interruptCurrent: z
+    .boolean()
+    .default(false)
+});
+
+const ReconnectConfigSchema = z.object({
+  enabled: z
+    .boolean()
+    .default(true),
+
+  maxAttempts: z
+    .number()
+    .int()
+    .nonnegative()
+    .default(10),
+
+  delayMs: z
+    .number()
+    .int()
+    .positive()
+    .default(5000),
+
+  maxDelayMs: z
+    .number()
+    .int()
+    .positive()
+    .default(60000)
+});
+
+const CallConfigSchema = z.object({
+  autoJoin: z
+    .boolean()
+    .default(true),
+
+  autoLeave: z
+    .boolean()
+    .default(true),
+
+  joinDelayMs: z
+    .number()
+    .int()
+    .nonnegative()
+    .default(1000),
+
+  reconnectDelayMs: z
+    .number()
+    .int()
+    .positive()
+    .default(3000)
+});
+
+const AudioConfigSchema = z.object({
+  sampleRate: z
+    .number()
+    .int()
+    .positive()
+    .default(48000),
+
+  channels: z
+    .number()
+    .int()
+    .positive()
+    .default(1),
+
+  frameDurationMs: z
+    .number()
+    .int()
+    .positive()
+    .default(20)
+});
+
+const NotificationsConfigSchema = z.object({
+  entry: z
+    .boolean()
+    .default(true),
+
+  exit: z
+    .boolean()
+    .default(true)
+});
+
+const RateLimitConfigSchema = z.object({
+  enabled: z
+    .boolean()
+    .default(true),
+
+  maxMessages: z
+    .number()
+    .int()
+    .positive()
+    .default(20),
+
+  windowMs: z
+    .number()
+    .int()
+    .positive()
+    .default(10000)
+});
+
+const LoggingConfigSchema = z.object({
+  level: z
+    .enum([
+      "debug",
+      "info",
+      "warn",
+      "error"
+    ])
+    .default("info"),
+
+  file: z
+    .string()
+    .default("logs/app.log"),
+
+  console: z
+    .boolean()
+    .default(true)
+});
+
+const GuiConfigSchema = z.object({
+  enabled: z
+    .boolean()
+    .default(true),
+
+  closeToTray: z
+    .boolean()
+    .default(true),
+
+  startMinimized: z
+    .boolean()
+    .default(false),
+
+  tray: z
+    .boolean()
+    .default(true)
+});
+
 export const AppConfigSchema = z.object({
-  version: z.literal(1).default(1),
+  version: z
+    .literal(1)
+    .default(1),
 
-  line: z.object({
-    device: z.string().default("DESKTOPWIN"),
-    sessionFile: z.string().default("data/session/line.json"),
+  line: LineConfigSchema.default(
+    LineConfigSchema.parse({})
+  ),
 
-    auth: z.object({
-      mode: z.enum([
-        "password",
-        "token"
-      ]).default("password")
-    })
-  }).default({}),
-
-  voicevox: z.object({
-    enabled: z.boolean().default(true),
-
-    host: z.string().default("127.0.0.1"),
-    port: z.number().int().positive().default(50021),
-
-    autoStart: z.boolean().default(true),
-    required: z.boolean().default(false),
-
-    executable: z.string().default("VOICEVOX/run.exe"),
-    args: z.array(z.string()).default([]),
-
-    startupTimeoutMs: z
-      .number()
-      .int()
-      .positive()
-      .default(90000),
-
-    requestTimeoutMs: z
-      .number()
-      .int()
-      .positive()
-      .default(10000),
-
-    stopOnExit: z.boolean().default(true)
-  }).default({}),
+  voicevox: VoicevoxConfigSchema.default(
+    VoicevoxConfigSchema.parse({})
+  ),
 
   groups: z
-    .record(GroupConfigSchema)
+    .record(
+      z.string(),
+      GroupConfigSchema
+    )
     .default({}),
 
-  speakers: z.object({
-    default: z.number().int().nonnegative().default(1),
-
-    users: z
-      .record(z.number().int().nonnegative())
-      .default({})
-  }).default({}),
+  speakers: SpeakersConfigSchema.default(
+    SpeakersConfigSchema.parse({})
+  ),
 
   replaceRules: z
     .array(ReplaceRuleSchema)
@@ -95,144 +323,49 @@ export const AppConfigSchema = z.object({
       }
     ]),
 
-  filters: z.object({
-    ignoreEmpty: z.boolean().default(true),
-    ignoreOwnMessages: z.boolean().default(true),
-    ignoreBotMessages: z.boolean().default(true),
-    ignoreCommands: z.boolean().default(true),
+  filters: FiltersConfigSchema.default(
+    FiltersConfigSchema.parse({})
+  ),
 
-    maxMessageLength: z
-      .number()
-      .int()
-      .positive()
-      .default(500),
+  queue: QueueConfigSchema.default(
+    QueueConfigSchema.parse({})
+  ),
 
-    blockedWords: z.array(z.string()).default([]),
+  reconnect: ReconnectConfigSchema.default(
+    ReconnectConfigSchema.parse({})
+  ),
 
-    blockedUsers: z.array(z.string()).default([])
-  }).default({}),
+  call: CallConfigSchema.default(
+    CallConfigSchema.parse({})
+  ),
 
-  queue: z.object({
-    maxSize: z.number().int().positive().default(20),
+  audio: AudioConfigSchema.default(
+    AudioConfigSchema.parse({})
+  ),
 
-    overflowPolicy: z
-      .enum([
-        "drop-oldest",
-        "drop-newest"
-      ])
-      .default("drop-oldest"),
+  notifications:
+    NotificationsConfigSchema.default(
+      NotificationsConfigSchema.parse({})
+    ),
 
-    interruptCurrent: z.boolean().default(false)
-  }).default({}),
+  rateLimit:
+    RateLimitConfigSchema.default(
+      RateLimitConfigSchema.parse({})
+    ),
 
-  reconnect: z.object({
-    enabled: z.boolean().default(true),
+  logging:
+    LoggingConfigSchema.default(
+      LoggingConfigSchema.parse({})
+    ),
 
-    maxAttempts: z
-      .number()
-      .int()
-      .nonnegative()
-      .default(10),
-
-    delayMs: z
-      .number()
-      .int()
-      .positive()
-      .default(5000),
-
-    maxDelayMs: z
-      .number()
-      .int()
-      .positive()
-      .default(60000)
-  }).default({}),
-
-  call: z.object({
-    autoJoin: z.boolean().default(true),
-
-    autoLeave: z.boolean().default(true),
-
-    joinDelayMs: z
-      .number()
-      .int()
-      .nonnegative()
-      .default(1000),
-
-    reconnectDelayMs: z
-      .number()
-      .int()
-      .positive()
-      .default(3000)
-  }).default({}),
-
-  audio: z.object({
-    sampleRate: z
-      .number()
-      .int()
-      .positive()
-      .default(48000),
-
-    channels: z
-      .number()
-      .int()
-      .positive()
-      .default(1),
-
-    frameDurationMs: z
-      .number()
-      .int()
-      .positive()
-      .default(20)
-  }).default({}),
-
-  notifications: z.object({
-    entry: z.boolean().default(true),
-    exit: z.boolean().default(true)
-  }).default({}),
-
-  rateLimit: z.object({
-    enabled: z.boolean().default(true),
-
-    maxMessages: z
-      .number()
-      .int()
-      .positive()
-      .default(20),
-
-    windowMs: z
-      .number()
-      .int()
-      .positive()
-      .default(10000)
-  }).default({}),
-
-  logging: z.object({
-    level: z
-      .enum([
-        "debug",
-        "info",
-        "warn",
-        "error"
-      ])
-      .default("info"),
-
-    file: z.string().default("logs/app.log"),
-
-    console: z.boolean().default(true)
-  }).default({}),
-
-  gui: z.object({
-    enabled: z.boolean().default(true),
-
-    closeToTray: z.boolean().default(true),
-
-    startMinimized: z.boolean().default(false),
-
-    tray: z.boolean().default(true)
-  }).default({})
+  gui:
+    GuiConfigSchema.default(
+      GuiConfigSchema.parse({})
+    )
 });
 
-export type AppConfig = z.infer<typeof AppConfigSchema>;
+export type AppConfig =
+  z.infer<typeof AppConfigSchema>;
 
 export function createDefaultConfig(): AppConfig {
   return AppConfigSchema.parse({});

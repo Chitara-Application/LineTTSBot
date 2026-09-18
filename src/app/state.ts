@@ -82,10 +82,10 @@ export class StateManager
     const event: StateChangeEvent = {
       previous,
       current: next,
-      reason,
-      changedAt: this.changedAt
-    };
-
+      changedAt: this.changedAt,
+    ...(reason !== undefined ? { reason } : {})
+    }; 
+    
     this.emit(
       "change",
       event

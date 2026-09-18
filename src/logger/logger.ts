@@ -1,14 +1,7 @@
-import pino, {
-  type Logger
-} from "pino";
-
+import pino, { type Logger } from "pino";
 import pretty from "pino-pretty";
-
 import path from "node:path";
-
-import {
-  mkdir
-} from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 
 export interface LoggerOptions {
   level: "debug" | "info" | "warn" | "error";
@@ -21,25 +14,13 @@ export async function createLogger(
 ): Promise<Logger> {
   await mkdir(
     path.dirname(options.filePath),
-    {
-      recursive: true
-    }
+    { recursive: true }
   );
 
-  const streams: Array<{
-    level?: string;
-    stream: NodeJS.WritableStream;
-  }> = [];
-
-  const fileStream =
-    pino.destination({
-      dest: options.filePath,
-      mkdir: true,
-      sync: false
-    });
-
-  streams.push({
-    stream: fileStream
+  const fileStream = pino.destination({
+    dest: options.filePath,
+    mkdir: true,
+    sync: false
   });
 
   if (options.console) {
@@ -49,20 +30,23 @@ export async function createLogger(
       singleLine: true
     });
 
-    streams.push({
-      stream: consoleStream
-    });
+    return pino(
+      {
+        level: options.level,
+        base: { app: "LineTTSBot" }
+      },
+      pino.multistream([
+        { stream: fileStream },
+        { stream: consoleStream }
+      ])
+    );
   }
 
   return pino(
     {
       level: options.level,
-      base: {
-        app: "LineTTSBot"
-      }
+      base: { app: "LineTTSBot" }
     },
-    pino.multistream(
-      streams
-    )
+    fileStream
   );
 }
