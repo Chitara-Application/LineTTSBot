@@ -29,7 +29,7 @@
   },
   "include": [
     "src/**/*.ts"
-, "src/gui/preload.cts"  ],
+, "src/gui/preload.cts", "src/gui/bot-controller.cts"  ],
   "exclude": [
     "node_modules",
     "dist",
