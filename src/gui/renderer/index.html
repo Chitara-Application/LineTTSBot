@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>LineTTSBot</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <header class="titlebar">
+      <div class="titlebar-brand">
+        <div class="brand-mark">L</div>
+
+        <div>
+          <div class="brand-title">
+            LineTTSBot
+          </div>
+
+          <div class="brand-subtitle">
+            LINE Voice Bot
+          </div>
+        </div>
+      </div>
+
+      <div class="window-controls">
+        <button
+          id="minimizeButton"
+          class="window-button"
+          title="最小化"
+        >─</button>
+
+        <button
+          id="maximizeButton"
+          class="window-button"
+          title="最大化"
+        >□</button>
+
+        <button
+          id="closeButton"
+          class="window-button close"
+          title="タスクトレイへ"
+        >×</button>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <section class="hero-card">
+
+        <div class="section-label">
+          BOT STATUS
+        </div>
+
+        <div class="status-row">
+
+          <div
+            id="statusIndicator"
+            class="status-indicator offline"
+          ></div>
+
+          <div>
+            <div
+              id="statusText"
+              class="status-text"
+            >
+              OFFLINE
+            </div>
+
+            <div
+              id="statusDescription"
+              class="status-description"
+            >
+              Botは停止しています
+            </div>
+          </div>
+
+        </div>
+
+        <div class="actions">
+
+          <button
+            id="startButton"
+            class="primary-button"
+          >
+            Start
+          </button>
+
+          <button
+            id="stopButton"
+            class="secondary-button"
+          >
+            Stop
+          </button>
+
+          <button
+            id="restartButton"
+            class="secondary-button"
+          >
+            Restart
+          </button>
+
+        </div>
+
+      </section>
+
+      <section class="info-grid">
+
+        <div class="info-card">
+          <div class="info-label">
+            LINE
+          </div>
+
+          <div
+            id="lineStatus"
+            class="info-value"
+          >
+            未接続
+          </div>
+
+          <div class="info-note">
+            Phase 2で接続
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-label">
+            VOICEVOX
+          </div>
+
+          <div
+            id="voicevoxStatus"
+            class="info-value"
+          >
+            Phase 0 Ready
+          </div>
+
+          <div class="info-note">
+            Engine管理済み
+          </div>
+        </div>
+
+      </section>
+
+      <section class="log-card">
+
+        <div class="log-header">
+
+          <div>
+            <div class="section-label">
+              ACTIVITY LOG
+            </div>
+
+            <div class="log-title">
+              Bot Events
+            </div>
+          </div>
+
+          <button
+            id="clearLogsButton"
+            class="clear-button"
+          >
+            Clear
+          </button>
+
+        </div>
+
+        <div
+          id="logContainer"
+          class="log-container"
+        ></div>
+
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <span>LineTTSBot</span>
+      <span>Phase 1</span>
+    </footer>
+
+  </div>
+
+  <script src="./renderer.js"></script>
+</body>
+</html>
