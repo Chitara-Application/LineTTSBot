@@ -30,15 +30,38 @@ const ReplaceRuleSchema = z.object({
 });
 
 const LineAuthSchema = z.object({
-  mode: z.enum(["password", "token"]).default("password")
+  mode: z
+    .enum([
+      "qr",
+      "password",
+      "token"
+    ])
+    .default("qr")
 });
 
+const LineDeviceSchema = z.enum([
+  "DESKTOPWIN",
+  "DESKTOPMAC",
+  "ANDROID",
+  "ANDROIDSECONDARY",
+  "IOS",
+  "IOSIPAD",
+  "WATCHOS",
+  "WEAROS"
+]);
 const LineConfigSchema = z.object({
-  device: z.string().default("DESKTOPWIN"),
-  sessionFile: z.string().default("data/session/line.json"),
-  auth: LineAuthSchema.default(LineAuthSchema.parse({}))
-});
+  device: LineDeviceSchema.default(
+    "DESKTOPWIN"
+  ),
 
+  sessionFile: z.string().default(
+    "data/session/line.json"
+  ),
+
+  auth: LineAuthSchema.default(
+    LineAuthSchema.parse({})
+  )
+});
 const VoicevoxConfigSchema = z.object({
   enabled: z.boolean().default(true),
 

@@ -39,15 +39,27 @@ await mkdir(
 );
 
 await copyFile(
-  path.join(source, "index.html"),
-  path.join(destination, "index.html")
+  path.join(
+    source,
+    "index.html"
+  ),
+  path.join(
+    destination,
+    "index.html"
+  )
 );
 
 await copyFile(
-  path.join(source, "style.css"),
-  path.join(destination, "style.css")
+  path.join(
+    source,
+    "style.css"
+  ),
+  path.join(
+    destination,
+    "style.css"
+  )
 );
 
-console.log(
-  "GUI static files copied."
+process.stdout.write(
+  "GUI static files copied.\n"
 );

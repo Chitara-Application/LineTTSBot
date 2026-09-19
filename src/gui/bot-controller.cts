@@ -25,15 +25,14 @@ export interface BotCoreAdapter {
 export class BotController {
   private state: GuiBotState = "OFFLINE";
 
-  private readonly listeners: {
-    stateChanged: Set<BotControllerEvents["stateChanged"]>;
-    log: Set<BotControllerEvents["log"]>;
-    error: Set<BotControllerEvents["error"]>;
-  } = {
-    stateChanged: new Set(),
-    log: new Set(),
-    error: new Set()
-  };
+  private readonly stateListeners =
+    new Set<BotControllerEvents["stateChanged"]>();
+
+  private readonly logListeners =
+    new Set<BotControllerEvents["log"]>();
+
+  private readonly errorListeners =
+    new Set<BotControllerEvents["error"]>();
 
   public constructor(
     private readonly core: BotCoreAdapter
@@ -52,12 +51,16 @@ export class BotController {
     }
 
     this.setState("STARTING");
-    this.writeLog("INFO", "Bot Coreを起動しています。");
+    this.writeLog(
+      "INFO",
+      "Bot Coreを起動しています。"
+    );
 
     try {
       await this.core.start();
 
       this.setState("READY");
+
       this.writeLog(
         "INFO",
         "Bot Coreの初期化が完了しました。"
@@ -69,12 +72,13 @@ export class BotController {
           : String(error);
 
       this.setState("ERROR");
+
       this.writeLog(
         "ERROR",
         `Bot Coreの起動に失敗しました: ${message}`
       );
 
-      this.emit("error", message);
+      this.emitError(message);
 
       throw error;
     }
@@ -89,12 +93,17 @@ export class BotController {
     }
 
     this.setState("STOPPING");
-    this.writeLog("INFO", "Bot Coreを停止しています。");
+
+    this.writeLog(
+      "INFO",
+      "Bot Coreを停止しています。"
+    );
 
     try {
       await this.core.stop();
 
       this.setState("OFFLINE");
+
       this.writeLog(
         "INFO",
         "Bot Coreを停止しました。"
@@ -106,19 +115,23 @@ export class BotController {
           : String(error);
 
       this.setState("ERROR");
+
       this.writeLog(
         "ERROR",
         `Bot Coreの停止に失敗しました: ${message}`
       );
 
-      this.emit("error", message);
+      this.emitError(message);
 
       throw error;
     }
   }
 
   public async restart(): Promise<void> {
-    this.writeLog("INFO", "Bot Coreを再起動します。");
+    this.writeLog(
+      "INFO",
+      "Bot Coreを再起動します。"
+    );
 
     if (this.state !== "OFFLINE") {
       await this.stop();
@@ -127,43 +140,94 @@ export class BotController {
     await this.start();
   }
 
-  public on<K extends keyof BotControllerEvents>(
-    event: K,
-    listener: BotControllerEvents[K]
-  ): () => void {
-    this.listeners[event].add(listener);
+  public on(
+    event: "stateChanged",
+    listener: BotControllerEvents["stateChanged"]
+  ): () => void;
 
-    return () => {
-      this.listeners[event].delete(listener);
-    };
+  public on(
+    event: "log",
+    listener: BotControllerEvents["log"]
+  ): () => void;
+
+  public on(
+    event: "error",
+    listener: BotControllerEvents["error"]
+  ): () => void;
+
+  public on(
+    event: keyof BotControllerEvents,
+    listener:
+      | BotControllerEvents["stateChanged"]
+      | BotControllerEvents["log"]
+      | BotControllerEvents["error"]
+  ): () => void {
+    switch (event) {
+      case "stateChanged": {
+        const typedListener =
+          listener as BotControllerEvents["stateChanged"];
+
+        this.stateListeners.add(typedListener);
+
+        return () => {
+          this.stateListeners.delete(typedListener);
+        };
+      }
+
+      case "log": {
+        const typedListener =
+          listener as BotControllerEvents["log"];
+
+        this.logListeners.add(typedListener);
+
+        return () => {
+          this.logListeners.delete(typedListener);
+        };
+      }
+
+      case "error": {
+        const typedListener =
+          listener as BotControllerEvents["error"];
+
+        this.errorListeners.add(typedListener);
+
+        return () => {
+          this.errorListeners.delete(typedListener);
+        };
+      }
+    }
   }
 
-  private setState(state: GuiBotState): void {
+  private setState(
+    state: GuiBotState
+  ): void {
     this.state = state;
 
-    this.emit(
-      "stateChanged",
-      state
-    );
+    for (const listener of this.stateListeners) {
+      listener(state);
+    }
   }
 
   private writeLog(
     level: GuiLogEvent["level"],
     message: string
   ): void {
-    this.emit("log", {
+    const event: GuiLogEvent = {
       timestamp: new Date().toISOString(),
       level,
       message
-    });
+    };
+
+    for (const listener of this.logListeners) {
+      listener(event);
+    }
   }
 
-  private emit<K extends keyof BotControllerEvents>(
-    event: K,
-    ...args: Parameters<BotControllerEvents[K]>
+  private emitError(
+    message: string
   ): void {
-    for (const listener of this.listeners[event]) {
-      listener(...args);
+    for (const listener of this.errorListeners) {
+      listener(message);
     }
   }
 }
