@@ -8,7 +8,6 @@ import {
 } from "electron";
 
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import {
   BotController,
@@ -18,12 +17,6 @@ import {
 import {
   Phase0CoreAdapter
 } from "./core-adapter.cjs";
-
-const __filename =
-  fileURLToPath(import.meta.url);
-
-const __dirname =
-  path.dirname(__filename);
 
 let mainWindow:
   | BrowserWindow
@@ -68,10 +61,14 @@ function createWindow(): void {
     new BrowserWindow({
       width: 920,
       height: 720,
+
       minWidth: 760,
       minHeight: 600,
+
       backgroundColor: "#0c0f14",
+
       show: false,
+
       autoHideMenuBar: true,
 
       webPreferences: {
@@ -79,18 +76,24 @@ function createWindow(): void {
           __dirname,
           "preload.cjs"
         ),
+
         contextIsolation: true,
+
         nodeIntegration: false,
+
         sandbox: true
       }
     });
 
-  mainWindow.loadFile(
+  const rendererPath =
     path.join(
       __dirname,
       "renderer",
       "index.html"
-    )
+    );
+
+  mainWindow.loadFile(
+    rendererPath
   );
 
   mainWindow.once(
@@ -108,6 +111,7 @@ function createWindow(): void {
       }
 
       event.preventDefault();
+
       mainWindow?.hide();
     }
   );
@@ -171,22 +175,29 @@ function updateTrayMenu(): void {
         enabled: false
       },
 
-      { type: "separator" },
+      {
+        type: "separator"
+      },
 
       {
         label: "Open",
+
         click: () => {
           showWindow();
         }
       },
 
-      { type: "separator" },
+      {
+        type: "separator"
+      },
 
       {
         label: "Bot Start",
+
         enabled:
           state !== "STARTING" &&
           state !== "READY",
+
         click: () => {
           void botController
             .start()
@@ -196,9 +207,11 @@ function updateTrayMenu(): void {
 
       {
         label: "Bot Stop",
+
         enabled:
           state !== "OFFLINE" &&
           state !== "STOPPING",
+
         click: () => {
           void botController
             .stop()
@@ -208,9 +221,11 @@ function updateTrayMenu(): void {
 
       {
         label: "Bot Restart",
+
         enabled:
           state !== "STARTING" &&
           state !== "STOPPING",
+
         click: () => {
           void botController
             .restart()
@@ -218,10 +233,13 @@ function updateTrayMenu(): void {
         }
       },
 
-      { type: "separator" },
+      {
+        type: "separator"
+      },
 
       {
         label: "Exit",
+
         click: () => {
           app.quit();
         }
@@ -276,10 +294,12 @@ function registerIpc(): void {
 
       if (mainWindow.isMaximized()) {
         mainWindow.unmaximize();
+
         return false;
       }
 
       mainWindow.maximize();
+
       return true;
     }
   );
@@ -336,9 +356,11 @@ if (!gotSingleInstanceLock) {
 
   app.whenReady().then(() => {
     registerIpc();
+
     registerControllerEvents();
 
     createWindow();
+
     createTray();
 
     app.on(
@@ -366,6 +388,7 @@ if (!gotSingleInstanceLock) {
       }
 
       event.preventDefault();
+
       isQuitting = true;
 
       void botController

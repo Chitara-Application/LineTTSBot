@@ -60,6 +60,6 @@ await copyFile(
   )
 );
 
-process.stdout.write(
+globalThis.process.stdout.write(
   "GUI static files copied.\n"
 );

@@ -52,7 +52,9 @@ export class LineClient {
     "disconnected";
 
   private readonly config: AppConfig;
-  private readonly credentials: LineAuthCredentials;
+
+  private readonly credentials:
+    LineAuthCredentials;
 
   private readonly stateListeners =
     new Set<
@@ -139,7 +141,9 @@ export class LineClient {
             },
             init
           );
-      } else if (mode === "password") {
+      } else if (
+        mode === "password"
+      ) {
         if (
           !this.credentials.email ||
           !this.credentials.password
@@ -192,6 +196,7 @@ export class LineClient {
           : new Error(String(error));
 
       this.emitError(normalized);
+
       this.setState("error");
 
       throw normalized;
@@ -219,54 +224,55 @@ export class LineClient {
   }
 
   public async getProfile() {
-    this.requireClient();
-
-    return this.client.getMyProfile();
+    return this.requireClient()
+      .getMyProfile();
   }
 
   public async getJoinedChats() {
-    this.requireClient();
-
-    return this.client.fetchJoinedChats();
+    return this.requireClient()
+      .fetchJoinedChats();
   }
 
   public async getChat(
     chatId: string
   ) {
-    this.requireClient();
-
-    return this.client.getChat(chatId);
+    return this.requireClient()
+      .getChat(chatId);
   }
 
   public listen(): void {
-    this.requireClient();
-
-    this.client.listen();
+    this.requireClient()
+      .listen();
   }
 
   public on(
     event: "stateChanged",
-    listener: LineClientEvents["stateChanged"]
+    listener:
+      LineClientEvents["stateChanged"]
   ): () => void;
 
   public on(
     event: "qr",
-    listener: LineClientEvents["qr"]
+    listener:
+      LineClientEvents["qr"]
   ): () => void;
 
   public on(
     event: "pin",
-    listener: LineClientEvents["pin"]
+    listener:
+      LineClientEvents["pin"]
   ): () => void;
 
   public on(
     event: "authToken",
-    listener: LineClientEvents["authToken"]
+    listener:
+      LineClientEvents["authToken"]
   ): () => void;
 
   public on(
     event: "error",
-    listener: LineClientEvents["error"]
+    listener:
+      LineClientEvents["error"]
   ): () => void;
 
   public on(
@@ -281,56 +287,81 @@ export class LineClient {
     switch (event) {
       case "stateChanged": {
         const typed =
-          listener as LineClientEvents["stateChanged"];
+          listener as
+            LineClientEvents["stateChanged"];
 
-        this.stateListeners.add(typed);
+        this.stateListeners.add(
+          typed
+        );
 
         return () => {
-          this.stateListeners.delete(typed);
+          this.stateListeners.delete(
+            typed
+          );
         };
       }
 
       case "qr": {
         const typed =
-          listener as LineClientEvents["qr"];
+          listener as
+            LineClientEvents["qr"];
 
-        this.qrListeners.add(typed);
+        this.qrListeners.add(
+          typed
+        );
 
         return () => {
-          this.qrListeners.delete(typed);
+          this.qrListeners.delete(
+            typed
+          );
         };
       }
 
       case "pin": {
         const typed =
-          listener as LineClientEvents["pin"];
+          listener as
+            LineClientEvents["pin"];
 
-        this.pinListeners.add(typed);
+        this.pinListeners.add(
+          typed
+        );
 
         return () => {
-          this.pinListeners.delete(typed);
+          this.pinListeners.delete(
+            typed
+          );
         };
       }
 
       case "authToken": {
         const typed =
-          listener as LineClientEvents["authToken"];
+          listener as
+            LineClientEvents["authToken"];
 
-        this.authTokenListeners.add(typed);
+        this.authTokenListeners.add(
+          typed
+        );
 
         return () => {
-          this.authTokenListeners.delete(typed);
+          this.authTokenListeners.delete(
+            typed
+          );
         };
       }
 
       case "error": {
         const typed =
-          listener as LineClientEvents["error"];
+          listener as
+            LineClientEvents["error"];
 
-        this.errorListeners.add(typed);
+        this.errorListeners.add(
+          typed
+        );
 
         return () => {
-          this.errorListeners.delete(typed);
+          this.errorListeners.delete(
+            typed
+          );
         };
       }
     }
@@ -365,7 +396,8 @@ export class LineClient {
     this.state = state;
 
     for (
-      const listener of this.stateListeners
+      const listener of
+        this.stateListeners
     ) {
       listener(state);
     }
@@ -375,7 +407,8 @@ export class LineClient {
     url: string
   ): void {
     for (
-      const listener of this.qrListeners
+      const listener of
+        this.qrListeners
     ) {
       listener(url);
     }
@@ -385,7 +418,8 @@ export class LineClient {
     pin: string
   ): void {
     for (
-      const listener of this.pinListeners
+      const listener of
+        this.pinListeners
     ) {
       listener(pin);
     }
@@ -395,7 +429,8 @@ export class LineClient {
     token: string
   ): void {
     for (
-      const listener of this.authTokenListeners
+      const listener of
+        this.authTokenListeners
     ) {
       listener(token);
     }
@@ -405,7 +440,8 @@ export class LineClient {
     error: Error
   ): void {
     for (
-      const listener of this.errorListeners
+      const listener of
+        this.errorListeners
     ) {
       listener(error);
     }

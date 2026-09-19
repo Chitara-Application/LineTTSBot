@@ -112,29 +112,33 @@ process.on(
   }
 );
 
-try {
-  await app.start();
-} catch (error) {
-  const logger =
-    app.getLogger();
+async function main(): Promise<void> {
+  try {
+    await app.start();
+  } catch (error) {
+    const logger =
+      app.getLogger();
 
-  if (logger !== null) {
-    logger.fatal(
-      {
-        error:
-          getErrorMessage(error)
-      },
-      "Applicationの起動に失敗しました。"
-    );
-  } else {
-    console.error(
-      "Applicationの起動に失敗しました:",
-      error
+    if (logger !== null) {
+      logger.fatal(
+        {
+          error:
+            getErrorMessage(error)
+        },
+        "Applicationの起動に失敗しました。"
+      );
+    } else {
+      console.error(
+        "Applicationの起動に失敗しました:",
+        error
+      );
+    }
+
+    await shutdown(
+      "startup failure",
+      1
     );
   }
-
-  await shutdown(
-    "startup failure",
-    1
-  );
 }
+
+void main();

@@ -5,85 +5,94 @@ type GuiState =
   | "STOPPING"
   | "ERROR";
 
+function getElement<T extends Element>(
+  selector: string
+): T {
+  const element =
+    document.querySelector<T>(selector);
+
+  if (!element) {
+    throw new Error(
+      `GUI element not found: ${selector}`
+    );
+  }
+
+  return element;
+}
+
 const statusText =
-  document.querySelector<HTMLDivElement>(
+  getElement<HTMLDivElement>(
     "#statusText"
   );
 
 const statusDescription =
-  document.querySelector<HTMLDivElement>(
+  getElement<HTMLDivElement>(
     "#statusDescription"
   );
 
 const statusIndicator =
-  document.querySelector<HTMLDivElement>(
+  getElement<HTMLDivElement>(
     "#statusIndicator"
   );
 
 const startButton =
-  document.querySelector<HTMLButtonElement>(
+  getElement<HTMLButtonElement>(
     "#startButton"
   );
 
 const stopButton =
-  document.querySelector<HTMLButtonElement>(
+  getElement<HTMLButtonElement>(
     "#stopButton"
   );
 
 const restartButton =
-  document.querySelector<HTMLButtonElement>(
+  getElement<HTMLButtonElement>(
     "#restartButton"
   );
 
 const clearLogsButton =
-  document.querySelector<HTMLButtonElement>(
+  getElement<HTMLButtonElement>(
     "#clearLogsButton"
   );
 
 const logContainer =
-  document.querySelector<HTMLDivElement>(
+  getElement<HTMLDivElement>(
     "#logContainer"
   );
 
 const minimizeButton =
-  document.querySelector<HTMLButtonElement>(
+  getElement<HTMLButtonElement>(
     "#minimizeButton"
   );
 
 const maximizeButton =
-  document.querySelector<HTMLButtonElement>(
+  getElement<HTMLButtonElement>(
     "#maximizeButton"
   );
 
 const closeButton =
-  document.querySelector<HTMLButtonElement>(
+  getElement<HTMLButtonElement>(
     "#closeButton"
   );
 
-if (
-  !statusText ||
-  !statusDescription ||
-  !statusIndicator ||
-  !startButton ||
-  !stopButton ||
-  !restartButton ||
-  !clearLogsButton ||
-  !logContainer ||
-  !minimizeButton ||
-  !maximizeButton ||
-  !closeButton
-) {
-  throw new Error(
-    "Required GUI elements were not found."
-  );
-}
+const stateDescriptions: Record<
+  GuiState,
+  string
+> = {
+  OFFLINE:
+    "Botは停止しています",
 
-const stateDescriptions: Record<GuiState, string> = {
-  OFFLINE: "Botは停止しています",
-  STARTING: "Botを起動しています",
-  READY: "Botは動作可能です",
-  STOPPING: "Botを停止しています",
-  ERROR: "Botでエラーが発生しました"
+  STARTING:
+    "Botを起動しています",
+
+  READY:
+    "Botは動作可能です",
+
+  STOPPING:
+    "Botを停止しています",
+
+  ERROR:
+    "Botでエラーが発生しました"
 };
 
 function setState(
@@ -114,7 +123,10 @@ function setState(
 function addLog(
   event: {
     timestamp: string;
-    level: "INFO" | "WARN" | "ERROR";
+    level:
+      | "INFO"
+      | "WARN"
+      | "ERROR";
     message: string;
   }
 ): void {
@@ -139,8 +151,11 @@ function addLog(
   const timeElement =
     document.createElement("span");
 
-  timeElement.className = "log-time";
-  timeElement.textContent = time;
+  timeElement.className =
+    "log-time";
+
+  timeElement.textContent =
+    time;
 
   const levelElement =
     document.createElement("span");
@@ -171,8 +186,15 @@ function addLog(
   while (
     logContainer.children.length > 300
   ) {
+    const firstChild =
+      logContainer.firstElementChild;
+
+    if (!firstChild) {
+      break;
+    }
+
     logContainer.removeChild(
-      logContainer.firstChild!
+      firstChild
     );
   }
 
@@ -200,7 +222,9 @@ startButton.addEventListener(
       addLog({
         timestamp:
           new Date().toISOString(),
+
         level: "ERROR",
+
         message:
           error instanceof Error
             ? error.message
@@ -219,7 +243,9 @@ stopButton.addEventListener(
       addLog({
         timestamp:
           new Date().toISOString(),
+
         level: "ERROR",
+
         message:
           error instanceof Error
             ? error.message
@@ -238,7 +264,9 @@ restartButton.addEventListener(
       addLog({
         timestamp:
           new Date().toISOString(),
+
         level: "ERROR",
+
         message:
           error instanceof Error
             ? error.message
@@ -277,7 +305,8 @@ maximizeButton.addEventListener(
 closeButton.addEventListener(
   "click",
   () => {
-    void window.lineTTS.window.closeToTray();
+    void window.lineTTS.window
+      .closeToTray();
   }
 );
 
@@ -298,7 +327,9 @@ window.lineTTS.events.onError(
     addLog({
       timestamp:
         new Date().toISOString(),
+
       level: "ERROR",
+
       message
     });
   }
@@ -313,7 +344,9 @@ void window.lineTTS.bot
     addLog({
       timestamp:
         new Date().toISOString(),
+
       level: "ERROR",
+
       message:
         error instanceof Error
           ? error.message
